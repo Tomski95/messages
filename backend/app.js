@@ -18,7 +18,7 @@ const fileStorage = multer.diskStorage({
     cb(null, 'images');
   },
   filename: (req, file, cb) => {
-    cb(null, new Date().toISOString() + '-' + file.originalname);
+    cb(null, new Date().toISOString().replace(/:/g, '-') + '-' + file.originalname);
   }
 });
 
@@ -77,7 +77,7 @@ app.use(
     schema: graphqlSchema,
     rootValue: graphqlResolver,
     graphiql: true,
-    formatError(err) {
+    customFormatErrorFn(err) {
       if (!err.originalError) {
         return err;
       }
@@ -99,7 +99,9 @@ app.use((error, req, res, next) => {
 
 mongoose
   .connect(
-    'mongodb+srv://tome:tome@cluster0.rjx0e.mongodb.net/messages'
+    'mongodb+srv://tome:tome@cluster0.rjx0e.mongodb.net/messages',
+    { useNewUrlParser: true,
+      useUnifiedTopology: true }
   )
   .then(result => {
     app.listen(8080);
